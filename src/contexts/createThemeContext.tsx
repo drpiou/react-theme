@@ -3,10 +3,12 @@ import { withoutProperties } from '@drpiou/ts-utils';
 import keys from 'lodash/keys';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React from 'react';
+import React, { useCallback } from 'react';
 
 export type ThemeProviderProps<K> = {
-  initialTheme?: K;
+  theme?: K;
+  defaultTheme?: K;
+  onChange?: (theme: K) => void;
 };
 
 export type ThemeContextOptions<K> = {
@@ -45,11 +47,28 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   });
 
   const Provider = (props: React.PropsWithChildren<ThemeProviderProps<Key>>): JSX.Element => {
-    const { initialTheme, children } = props;
+    const { theme: controlledTheme, defaultTheme, onChange, children } = props;
 
-    const [theme, setTheme] = useStateSafe<Key>(initialTheme ?? contextOptions.theme);
+    const [theme, setTheme] = useStateSafe<Key>(defaultTheme || contextOptions.theme);
 
-    return <ctx.Provider value={{ theme, setTheme }}>{children}</ctx.Provider>;
+    React.useEffect(() => {
+      setTheme((prevState) => controlledTheme || prevState);
+    }, [controlledTheme, setTheme]);
+
+    const handleTheme: SetThemeContext<Key> = useCallback(
+      (updatedState) => {
+        setTheme((prevState) => {
+          const newState = typeof updatedState === 'function' ? updatedState(prevState) : updatedState;
+
+          setTimeout(() => onChange?.(newState));
+
+          return newState;
+        });
+      },
+      [onChange, setTheme],
+    );
+
+    return <ctx.Provider value={{ theme, setTheme: handleTheme }}>{children}</ctx.Provider>;
   };
 
   const useCtx = (currentTheme?: Key): T[Key] & React.ContextType<typeof ctx> => {
@@ -60,12 +79,10 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
     }
 
     return React.useMemo(() => {
-      const theme = currentTheme ?? c.theme;
+      const theme = currentTheme || c.theme;
 
       return {
-        ...(contextOptions.theme === theme
-          ? themes[contextOptions.theme]
-          : merge({}, themes[contextOptions.theme], themes[theme])),
+        ...(contextOptions.theme === theme ? themes[theme] : merge({}, themes[contextOptions.theme], themes[theme])),
         theme,
         setTheme: c.setTheme,
       };
@@ -79,9 +96,9 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   ) => (props: WithThemeHocProps<P, T, Key>) => JSX.Element) => {
     return ((Component: React.ComponentType): React.ComponentType<WithThemeProps<Key>> => {
       const WithComponent = (props: WithThemeProps<Key>): JSX.Element => {
-        const { theme: initialTheme, ...rest } = props;
+        const { theme: defaultTheme, ...rest } = props;
 
-        const useTheme = useCtx(options?.theme ?? initialTheme ?? options?.defaultTheme);
+        const useTheme = useCtx(options?.theme || defaultTheme || options?.defaultTheme);
 
         return <Component {...(rest as any)} {...useTheme} />;
       };
@@ -92,7 +109,7 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
     }) as never;
   };
 
-  const withoutThemeKeys = [...keys(themes[contextOptions.theme]), 'theme'] as (
+  const withoutThemeKeys = [...keys(themes[contextOptions.theme]), 'theme', 'setTheme'] as (
     | keyof T[DefaultKey]
     | keyof WithThemeProps<Key>
   )[];
