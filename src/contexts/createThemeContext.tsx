@@ -51,10 +51,6 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
 
     const [theme, setTheme] = useStateSafe<Key>(defaultTheme || contextOptions.theme);
 
-    React.useEffect(() => {
-      setTheme((prevState) => controlledTheme || prevState);
-    }, [controlledTheme, setTheme]);
-
     const handleTheme: SetThemeContext<Key> = useCallback(
       (updatedState) => {
         setTheme((prevState) => {
@@ -68,7 +64,7 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
       [onChange, setTheme],
     );
 
-    return <ctx.Provider value={{ theme, setTheme: handleTheme }}>{children}</ctx.Provider>;
+    return <ctx.Provider value={{ theme: controlledTheme || theme, setTheme: handleTheme }}>{children}</ctx.Provider>;
   };
 
   const useCtx = (currentTheme?: Key): T[Key] & React.ContextType<typeof ctx> => {
@@ -96,9 +92,9 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   ) => (props: WithThemeHocProps<P, T, Key>) => JSX.Element) => {
     return ((Component: React.ComponentType): React.ComponentType<WithThemeProps<Key>> => {
       const WithComponent = (props: WithThemeProps<Key>): JSX.Element => {
-        const { theme: defaultTheme, ...rest } = props;
+        const { theme, ...rest } = props;
 
-        const useTheme = useCtx(options?.theme || defaultTheme || options?.defaultTheme);
+        const useTheme = useCtx(options?.theme || theme || options?.defaultTheme);
 
         return <Component {...(rest as any)} {...useTheme} />;
       };
