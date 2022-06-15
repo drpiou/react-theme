@@ -1,6 +1,8 @@
 import React from 'react';
 export declare type ThemeProviderProps<K> = {
-    initialTheme?: K;
+    theme?: K;
+    defaultTheme?: K;
+    onChange?: (theme: K) => void;
 };
 export declare type ThemeContextOptions<K> = {
     theme: K;

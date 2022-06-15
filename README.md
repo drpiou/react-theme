@@ -3,7 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/drpiou/react-theme)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/drpiou/react-theme)
 ![Jest tests](https://img.shields.io/badge/passed%20test-1-green)
-![Jest tests](https://img.shields.io/badge/stage-beta-important)
+![Jest tests](https://img.shields.io/badge/stage-experimental-important)
 ![GitHub all releases](https://img.shields.io/github/downloads/drpiou/react-theme/total)
 
 The `@drpiou/react-theme` package creates a React theme context.
@@ -107,7 +107,7 @@ export const [useTheme, ThemeProvider, withTheme, withoutTheme] =
 import { ThemeProvider } from './contexts/theme';
 
 const App = (): JSX.Element => {
-  return <ThemeProvider initialTheme={'default'}>{/* ... */}</ThemeProvider>;
+  return <ThemeProvider>{/* ... */}</ThemeProvider>;
 };
 
 export default App;
@@ -186,7 +186,9 @@ type withoutTheme<T, Key, DefaultKey> = <O extends object>(
 type ThemeProvider<K> = (props: ThemeProviderProps<K>) => JSX.Element;
 
 type ThemeProviderProps<K> = {
-  initialTheme?: K;
+  theme?: K;
+  defaultTheme?: K;
+  onChange?: (theme: K) => void;
 };
 
 type ThemeContextOptions<K> = {
