@@ -35,7 +35,7 @@ yarn add @drpiou/react-theme
 
 ### `themes/index.ts`
 
-```typescript jsx
+```typescript
 import { defaultTheme } from './default';
 
 export type ThemeList = typeof themes;
@@ -50,7 +50,7 @@ export const themes = {
 
 ### `themes/default/index.ts`
 
-```typescript jsx
+```typescript
 import { Theme } from '../../types/theme';
 
 export const defaultTheme: Theme = {
@@ -69,7 +69,7 @@ export const defaultTheme: Theme = {
 
 ### `types/theme.ts`
 
-```typescript jsx
+```typescript
 export type ThemeColor = keyof ThemeColorList;
 
 export type ThemeColorList = {
@@ -153,7 +153,7 @@ export default SplashScreen;
 
 ## Documentation
 
-```typescript jsx
+```typescript
 type createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   themes: T,
   contextOptions: ThemeContextOptions<DefaultKey>,
@@ -166,7 +166,7 @@ type createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
 
 type useTheme<T, Key> = (currentTheme?: Key) => T[Key] & {
   theme: Key;
-  setTheme: UseThemeSet<Key>;
+  setTheme: SetThemeContext<Key>;
 };
 
 type withTheme<T, Key> = (
@@ -197,7 +197,7 @@ type ThemeContextOptions<K> = {
 
 type WithThemeProps<P, K> = P & {
   theme: K;
-  setTheme: UseThemeSet<K>;
+  setTheme: SetThemeContext<K>;
 };
 
 type WithThemeOptions<K> = {
@@ -212,5 +212,5 @@ type WithThemeHocProps<P, T, Key extends keyof T> = Omit<
   theme?: Key;
 };
 
-type UseThemeSet<K> = React.Dispatch<React.SetStateAction<K>>;
+type SetThemeContext<K> = (state: K | ((state: K) => K | null)) => void;
 ```
