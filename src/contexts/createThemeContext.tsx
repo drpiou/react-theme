@@ -32,7 +32,7 @@ type WithThemeHocProps<P, T, Key extends keyof T> = Omit<
   theme?: Key;
 };
 
-type SetThemeContext<K> = React.Dispatch<React.SetStateAction<K>>;
+type SetThemeContext<K> = (state: K | ((state: K) => K | null)) => void;
 
 const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   themes: T,
@@ -55,6 +55,10 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
       (updatedState) => {
         setTheme((prevState) => {
           const newState = typeof updatedState === 'function' ? updatedState(prevState) : updatedState;
+
+          if (newState === null) {
+            return prevState;
+          }
 
           setTimeout(() => onChange?.(newState));
 

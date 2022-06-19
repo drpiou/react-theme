@@ -18,7 +18,7 @@ export declare type WithThemeOptions<K> = {
 declare type WithThemeHocProps<P, T, Key extends keyof T> = Omit<WithThemeProps<Key, Omit<P, keyof T[Key]>>, keyof WithThemeProps<Key>> & {
     theme?: Key;
 };
-declare type SetThemeContext<K> = React.Dispatch<React.SetStateAction<K>>;
+declare type SetThemeContext<K> = (state: K | ((state: K) => K | null)) => void;
 declare const createThemeContext: <T, Key extends keyof T, DefaultKey extends Key>(themes: T, contextOptions: ThemeContextOptions<DefaultKey>) => [(currentTheme?: Key | undefined) => T[Key] & {
     theme: Key;
     setTheme: SetThemeContext<Key>;
