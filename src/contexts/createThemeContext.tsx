@@ -3,7 +3,17 @@ import { withoutProperties } from '@drpiou/ts-utils';
 import keys from 'lodash/keys';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React, { useCallback } from 'react';
+import React, {
+  ComponentType,
+  ContextType,
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 export type ThemeProviderProps<K> = {
   theme?: K;
@@ -38,7 +48,7 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   themes: T,
   contextOptions: ThemeContextOptions<DefaultKey>,
 ): [typeof useCtx, typeof Provider, typeof withTheme, typeof withoutTheme] => {
-  const ctx = React.createContext<{
+  const ctx = createContext<{
     theme: Key;
     setTheme: SetThemeContext<Key>;
   }>({
@@ -46,39 +56,51 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
     setTheme: () => contextOptions.theme,
   });
 
-  const Provider = (props: React.PropsWithChildren<ThemeProviderProps<Key>>): JSX.Element => {
+  const Provider = (props: PropsWithChildren<ThemeProviderProps<Key>>): JSX.Element => {
     const { theme: controlledTheme, defaultTheme, onChange, children } = props;
 
+    const handleChange = useRef(onChange);
+
+    handleChange.current = onChange;
+
     const [theme, setTheme] = useStateSafe<Key>(defaultTheme || contextOptions.theme);
+
+    useEffect(() => {
+      console.log('__DEV__:createThemeContext@useEffect', { theme });
+
+      handleChange.current?.(theme);
+    }, [theme]);
 
     const handleTheme: SetThemeContext<Key> = useCallback(
       (updatedState) => {
         setTheme((prevState) => {
-          const newState = typeof updatedState === 'function' ? updatedState(prevState) : updatedState;
+          if (typeof updatedState === 'function') {
+            const newState = updatedState(prevState);
 
-          if (newState === null) {
-            return prevState;
+            if (newState === null) {
+              return prevState;
+            }
+
+            return newState;
+          } else {
+            return updatedState;
           }
-
-          setTimeout(() => onChange?.(newState));
-
-          return newState;
         });
       },
-      [onChange, setTheme],
+      [setTheme],
     );
 
     return <ctx.Provider value={{ theme: controlledTheme || theme, setTheme: handleTheme }}>{children}</ctx.Provider>;
   };
 
-  const useCtx = (currentTheme?: Key): T[Key] & React.ContextType<typeof ctx> => {
-    const c = React.useContext(ctx);
+  const useCtx = (currentTheme?: Key): T[Key] & ContextType<typeof ctx> => {
+    const c = useContext(ctx);
 
     if (c === undefined) {
       throw new Error("Couldn't find a context object. Is your component inside ThemeProvider?");
     }
 
-    return React.useMemo(() => {
+    return useMemo(() => {
       const theme = currentTheme || c.theme;
 
       return {
@@ -91,10 +113,10 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
 
   const withTheme = (
     options?: WithThemeOptions<Key>,
-  ): (<C extends React.ComponentType, P = C extends React.ComponentType<infer I> ? I : never>(
-    Component: React.ComponentType<P>,
+  ): (<C extends ComponentType, P = C extends ComponentType<infer I> ? I : never>(
+    Component: ComponentType<P>,
   ) => (props: WithThemeHocProps<P, T, Key>) => JSX.Element) => {
-    return ((Component: React.ComponentType): React.ComponentType<WithThemeProps<Key>> => {
+    return ((Component: ComponentType): ComponentType<WithThemeProps<Key>> => {
       const WithComponent = (props: WithThemeProps<Key>): JSX.Element => {
         const { theme, ...rest } = props;
 
