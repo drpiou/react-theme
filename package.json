@@ -1,60 +1,40 @@
 {
-  "name": "@drpiou/react-theme",
-  "version": "0.0.3",
-  "description": "Creates a React theme context.",
-  "keywords": [],
-  "author": "Alex <hello@drpiou.dev>",
-  "homepage": "https://github.com/drpiou/react-theme#readme",
-  "license": "ISC",
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  },
+  "name": "react-theme",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "files": [
-    "lib"
+    "dist"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/drpiou/react-theme.git"
+  "main": "./dist/react-theme.umd.cjs",
+  "module": "./dist/react-theme.js",
+  "types": "./dist/react-theme.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/react-theme.js",
+      "require": "./dist/react-theme.umd.cjs"
+    }
   },
   "scripts": {
-    "pack": "npm pack",
-    "build": "rollup -c",
-    "watch": "rollup -cw",
-    "prepare": "yarn build && yarn test",
-    "toc": "gh-md-toc --insert",
-    "test": "npx jest __tests__"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
-  "bugs": {
-    "url": "https://github.com/drpiou/react-theme/issues"
-  },
-  "peerDependencies": {
-    "react": "^17.0.2"
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.18.2",
-    "@babel/preset-react": "^7.17.12",
-    "@rollup/plugin-commonjs": "^22.0.0",
-    "@rollup/plugin-node-resolve": "^13.3.0",
-    "@testing-library/react-hooks": "^8.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.22.0",
-    "@typescript-eslint/parser": "^5.22.0",
-    "babel-jest": "^28.1.0",
-    "eslint": "^8.14.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.5.0",
-    "jest": "^28.1.0",
-    "prettier": "^2.6.2",
-    "react-test-renderer": "^17.0.2",
-    "rollup": "^2.75.1",
-    "rollup-plugin-typescript2": "^0.31.2",
-    "typescript": "^4.7.2"
+    "@types/lodash": "^4.14.182",
+    "@types/node": "^18.6.4",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@vitejs/plugin-react": "^2.0.0",
+    "lodash": "^4.17.21",
+    "react-utils": "https://github.com/drpiou/react-utils.git#hotfix/vite-integration",
+    "ts-utils": "https://github.com/drpiou/ts-utils.git#hotfix/vite-integration",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0",
+    "vite-plugin-dts": "^1.4.1"
   }
 }
