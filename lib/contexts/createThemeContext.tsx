@@ -1,5 +1,5 @@
-import { getComponentName, useStateSafe } from 'react-utils';
-import { withoutProperties } from 'ts-utils';
+import { getComponentName, useStateSafe } from '@drpiou/react-utils';
+import { withoutProperties } from '@drpiou/ts-utils';
 import keys from 'lodash/keys';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
