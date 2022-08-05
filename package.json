@@ -1,7 +1,21 @@
 {
-  "name": "react-theme",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@drpiou/react-theme",
+  "version": "0.0.4",
+  "description": "Creates a React theme context.",
+  "keywords": [],
+  "author": "Alex <hello@drpiou.dev>",
+  "homepage": "https://github.com/drpiou/react-theme#readme",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drpiou/react-theme.git"
+  },
+  "bugs": {
+    "url": "https://github.com/drpiou/react-theme/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "files": [
     "dist"
@@ -18,9 +32,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "toc": "gh-md-toc --insert"
   },
-  "dependencies": {
+  "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -31,6 +46,8 @@
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.0.0",
     "lodash": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-utils": "https://github.com/drpiou/react-utils.git#hotfix/vite-integration",
     "ts-utils": "https://github.com/drpiou/ts-utils.git#hotfix/vite-integration",
     "typescript": "^4.6.4",
