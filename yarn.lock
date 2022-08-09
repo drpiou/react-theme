@@ -241,12 +241,12 @@
     to-fast-properties "^2.0.0"
 
 "@drpiou/react-utils@https://github.com/drpiou/react-utils.git#hotfix/vite-integration":
-  version "0.0.3"
-  resolved "https://github.com/drpiou/react-utils.git#50d9a755d5f44ca24f3c9cef58b400eb58fe6153"
+  version "0.0.2"
+  resolved "https://github.com/drpiou/react-utils.git#ac72a44586eddd4f27c92f05627a32864ef9f208"
 
 "@drpiou/ts-utils@https://github.com/drpiou/ts-utils.git#hotfix/vite-integration":
-  version "0.0.4"
-  resolved "https://github.com/drpiou/ts-utils.git#5483c06d96c3086f2e11ba316e15439e7de6bd9a"
+  version "0.0.3"
+  resolved "https://github.com/drpiou/ts-utils.git#c387c0a23df893a24ffc9db9700e4547368b7a27"
 
 "@esbuild/linux-loong64@0.14.53":
   version "0.14.53"

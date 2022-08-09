@@ -19,6 +19,7 @@ export type ThemeProviderProps<K> = {
   theme?: K;
   defaultTheme?: K;
   onChange?: (theme: K) => void;
+  onRef?: (ref: WithThemeProps<K>) => void;
 };
 
 export type ThemeContextOptions<K> = {
@@ -57,7 +58,7 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   });
 
   const Provider = (props: PropsWithChildren<ThemeProviderProps<Key>>): JSX.Element => {
-    const { theme: controlledTheme, defaultTheme, onChange, children } = props;
+    const { theme: controlledTheme, defaultTheme, onChange, onRef, children } = props;
 
     const handleChange = useRef(onChange);
 
@@ -66,8 +67,6 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
     const [theme, setTheme] = useStateSafe<Key>(defaultTheme || contextOptions.theme);
 
     useEffect(() => {
-      console.log('__DEV__:createThemeContext@useEffect', { theme });
-
       handleChange.current?.(theme);
     }, [theme]);
 
@@ -90,7 +89,16 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
       [setTheme],
     );
 
-    return <ctx.Provider value={{ theme: controlledTheme || theme, setTheme: handleTheme }}>{children}</ctx.Provider>;
+    const ref = useMemo(
+      () => ({ theme: controlledTheme || theme, setTheme: handleTheme }),
+      [controlledTheme, handleTheme, theme],
+    );
+
+    useEffect(() => {
+      onRef?.(ref);
+    }, [ref, onRef]);
+
+    return <ctx.Provider value={ref}>{children}</ctx.Provider>;
   };
 
   const useCtx = (currentTheme?: Key): T[Key] & ContextType<typeof ctx> => {

@@ -1,16 +1,18 @@
-import React from 'react';
+import { log, logInfo } from '@drpiou/ts-utils';
+import React, { HTMLProps } from 'react';
 import './App.css';
-import { ThemeProvider, useTheme } from './context';
+import { ThemedProps, ThemeProvider, useTheme, withoutTheme, withTheme } from './context';
 
-function App(): JSX.Element {
+const App = (): JSX.Element => {
   return (
-    <ThemeProvider>
+    <ThemeProvider onChange={logInfo} onRef={log}>
       <Thing />
+      <WithThing />
     </ThemeProvider>
   );
-}
+};
 
-function Thing(): JSX.Element {
+const Thing = (): JSX.Element => {
   const { theme, setTheme } = useTheme();
 
   const handleClick = (): void => {
@@ -22,6 +24,20 @@ function Thing(): JSX.Element {
       <button onClick={handleClick}>{theme}</button>
     </div>
   );
-}
+};
+
+const WithThing = withTheme()((props: ThemedProps<HTMLProps<HTMLDivElement>>): JSX.Element => {
+  const { theme, setTheme, ...rest } = props;
+
+  const handleClick = (): void => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  return (
+    <div {...withoutTheme(rest)} className="card">
+      <button onClick={handleClick}>{theme}</button>
+    </div>
+  );
+});
 
 export default App;
