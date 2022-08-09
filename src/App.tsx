@@ -13,7 +13,7 @@ const App = (): JSX.Element => {
 };
 
 const Thing = (): JSX.Element => {
-  const { theme, setTheme } = useTheme();
+  const { colors, theme, setTheme } = useTheme();
 
   const handleClick = (): void => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -22,12 +22,13 @@ const Thing = (): JSX.Element => {
   return (
     <div className="card">
       <button onClick={handleClick}>{theme}</button>
+      <p>{`background: ${colors.background.light}`}</p>
     </div>
   );
 };
 
 const WithThing = withTheme()((props: ThemedProps<HTMLProps<HTMLDivElement>>): JSX.Element => {
-  const { theme, setTheme, ...rest } = props;
+  const { colors, theme, setTheme, ...rest } = props;
 
   const handleClick = (): void => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -36,6 +37,7 @@ const WithThing = withTheme()((props: ThemedProps<HTMLProps<HTMLDivElement>>): J
   return (
     <div {...withoutTheme(rest)} className="card">
       <button onClick={handleClick}>{theme}</button>
+      <p>{`text: ${colors.text.light}`}</p>
     </div>
   );
 });
