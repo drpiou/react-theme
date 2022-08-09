@@ -1,13 +1,27 @@
-import './App.css'
+import React from 'react';
+import './App.css';
+import { ThemeProvider, useTheme } from './context';
 
-function App() {
+function App(): JSX.Element {
   return (
-    <div className="App">
-      <div className="card">
-        <span id="counter">test...</span>
-      </div>
-    </div>
-  )
+    <ThemeProvider>
+      <Thing />
+    </ThemeProvider>
+  );
 }
 
-export default App
+function Thing(): JSX.Element {
+  const { theme, setTheme } = useTheme();
+
+  const handleClick = (): void => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  return (
+    <div className="card">
+      <button onClick={handleClick}>{theme}</button>
+    </div>
+  );
+}
+
+export default App;
