@@ -3,6 +3,7 @@ export declare type ThemeProviderProps<K> = {
     theme?: K;
     defaultTheme?: K;
     onChange?: (theme: K) => void;
+    onRef?: (ref: WithThemeProps<K>) => void;
 };
 export declare type ThemeContextOptions<K> = {
     theme: K;
