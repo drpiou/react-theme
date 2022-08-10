@@ -20,7 +20,7 @@ const Thing = (): JSX.Element => {
   };
 
   return (
-    <div className="card">
+    <div className={'card'}>
       <button onClick={handleClick}>{theme}</button>
       <p>{`background: ${colors.background.light}`}</p>
     </div>
@@ -35,7 +35,7 @@ const WithThing = withTheme()((props: ThemedProps<HTMLProps<HTMLDivElement>>): J
   };
 
   return (
-    <div {...withoutTheme(rest)} className="card">
+    <div {...withoutTheme(rest)} className={'card'}>
       <button onClick={handleClick}>{theme}</button>
       <p>{`text: ${colors.text.light}`}</p>
     </div>
