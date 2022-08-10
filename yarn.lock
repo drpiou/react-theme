@@ -242,7 +242,7 @@
 
 "@drpiou/react-utils@https://github.com/drpiou/react-utils.git#hotfix/vite-integration":
   version "0.0.2"
-  resolved "https://github.com/drpiou/react-utils.git#c0e88b171cc55ebc9ddf7eb77b08e9f6309644eb"
+  resolved "https://github.com/drpiou/react-utils.git#1fa897b7917c6c108969940fd1d49d833336ddbc"
 
 "@drpiou/ts-utils@https://github.com/drpiou/ts-utils.git#hotfix/vite-integration":
   version "0.0.3"

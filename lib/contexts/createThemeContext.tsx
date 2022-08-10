@@ -61,14 +61,12 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
     const { theme: controlledTheme, defaultTheme, onChange, onRef, children } = props;
 
     const handleChange = useRef(onChange);
-
-    handleChange.current = onChange;
+    const handleRef = useRef(onRef);
 
     const [theme, setTheme] = useStateSafe<Key>(defaultTheme || contextOptions.theme);
 
-    useEffect(() => {
-      handleChange.current?.(theme);
-    }, [theme]);
+    handleChange.current = onChange;
+    handleRef.current = onRef;
 
     const handleTheme: SetThemeContext<Key> = useCallback(
       (updatedState) => {
@@ -95,8 +93,12 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
     );
 
     useEffect(() => {
-      onRef?.(ref);
-    }, [ref, onRef]);
+      handleChange.current?.(theme);
+    }, [theme]);
+
+    useEffect(() => {
+      handleRef.current?.(ref);
+    }, [ref]);
 
     return <ctx.Provider value={ref}>{children}</ctx.Provider>;
   };
