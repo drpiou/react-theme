@@ -19,17 +19,19 @@ export type ThemeProviderProps<K> = {
   theme?: K;
   defaultTheme?: K;
   onChange?: (theme: K) => void;
-  onRef?: (ref: WithThemeProps<K>) => void;
+  onRef?: (ref: ThemeRef<K>) => void;
 };
 
 export type ThemeContextOptions<K> = {
   theme: K;
 };
 
-export type WithThemeProps<K, P = unknown> = P & {
+export type ThemeRef<K> = {
   theme: K;
   setTheme: SetThemeContext<K>;
 };
+
+export type WithThemeProps<K, P = unknown> = P & ThemeRef<K>;
 
 export type WithThemeOptions<K> = {
   theme?: K;
@@ -49,10 +51,7 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   themes: T,
   contextOptions: ThemeContextOptions<DefaultKey>,
 ): [typeof useCtx, typeof Provider, typeof withTheme, typeof withoutTheme] => {
-  const ctx = createContext<{
-    theme: Key;
-    setTheme: SetThemeContext<Key>;
-  }>({
+  const ctx = createContext<ThemeRef<Key>>({
     theme: contextOptions.theme,
     setTheme: () => contextOptions.theme,
   });
@@ -87,10 +86,11 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
       [setTheme],
     );
 
-    const ref = useMemo(
-      () => ({ theme: controlledTheme || theme, setTheme: handleTheme }),
-      [controlledTheme, handleTheme, theme],
-    );
+    const refTheme = controlledTheme || theme;
+
+    const ref = useMemo(() => {
+      return { theme: refTheme, setTheme: handleTheme };
+    }, [handleTheme, refTheme]);
 
     useEffect(() => {
       handleChange.current?.(theme);

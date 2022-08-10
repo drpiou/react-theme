@@ -1,9 +1,8 @@
 # `@drpiou/react-theme`
 
-![GitHub](https://img.shields.io/github/license/drpiou/react-theme)
-![GitHub package.json version](https://img.shields.io/github/package-json/v/drpiou/react-theme)
-![Jest tests](https://img.shields.io/badge/passed%20test-1-green)
-![Jest tests](https://img.shields.io/badge/stage-experimental-important)
+![Licence](https://img.shields.io/github/license/drpiou/react-theme)
+![Package.json version](https://img.shields.io/github/package-json/v/drpiou/react-theme)
+![Stage](https://img.shields.io/badge/stage-experimental-important)
 
 The `@drpiou/react-theme` package creates a React theme context.
 
