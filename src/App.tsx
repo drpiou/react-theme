@@ -1,11 +1,10 @@
-import { log, logInfo } from '@drpiou/ts-utils';
 import React, { HTMLProps } from 'react';
 import './App.css';
 import { ThemedProps, ThemeProvider, useTheme, withoutTheme, withTheme } from './context';
 
 const App = (): JSX.Element => {
   return (
-    <ThemeProvider onChange={logInfo} onRef={log}>
+    <ThemeProvider onChange={console.log} onRef={console.log}>
       <Thing />
       <WithThing />
     </ThemeProvider>
