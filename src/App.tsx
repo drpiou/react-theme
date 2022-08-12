@@ -1,3 +1,4 @@
+import { log } from '@drpiou/ts-utils';
 import React, { HTMLProps } from 'react';
 import './App.css';
 import { ThemedProps, ThemedRef, ThemeProvider, useTheme, withoutTheme, withTheme } from './contexts/theme';
@@ -5,11 +6,11 @@ import { ThemeKey } from './themes';
 
 const App = (): JSX.Element => {
   const handleChange = (state: ThemeKey): void => {
-    console.log('ThemeProvider@onChange: ', state);
+    log('ThemeProvider@onChange: ', state);
   };
 
   const handleRef = (ref: ThemedRef): void => {
-    console.log('ThemeProvider@onRef: ', ref);
+    log('ThemeProvider@onRef: ', ref);
   };
 
   return (
