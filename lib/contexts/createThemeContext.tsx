@@ -15,15 +15,14 @@ import React, {
   useRef,
 } from 'react';
 
-export type ThemeProviderProps<K> = {
-  theme?: K;
+export type ThemeContextOptions<K> = {
+  theme: K;
+};
+
+export type ThemeProviderProps<K> = Partial<ThemeContextOptions<K>> & {
   defaultTheme?: K;
   onChange?: (theme: K) => void;
   onRef?: (ref: ThemeRef<K>) => void;
-};
-
-export type ThemeContextOptions<K> = {
-  theme: K;
 };
 
 export type ThemeRef<K> = {
@@ -36,13 +35,6 @@ export type WithThemeProps<K, P = unknown> = P & ThemeRef<K>;
 export type WithThemeOptions<K> = {
   theme?: K;
   defaultTheme?: K;
-};
-
-type WithThemeHocProps<P, T, Key extends keyof T> = Omit<
-  WithThemeProps<Key, Omit<P, keyof T[Key]>>,
-  keyof WithThemeProps<Key>
-> & {
-  theme?: Key;
 };
 
 type SetThemeContext<K> = (state: K | ((state: K) => K | null)) => void;
@@ -86,11 +78,11 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
       [setTheme],
     );
 
-    const refTheme = controlledTheme || theme;
+    const themeValue = controlledTheme || theme;
 
     const ref = useMemo(() => {
-      return { theme: refTheme, setTheme: handleTheme };
-    }, [handleTheme, refTheme]);
+      return { theme: themeValue, setTheme: handleTheme };
+    }, [handleTheme, themeValue]);
 
     useEffect(() => {
       handleChange.current?.(theme);
@@ -123,9 +115,9 @@ const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
 
   const withTheme = (
     options?: WithThemeOptions<Key>,
-  ): (<C extends ComponentType, P = C extends ComponentType<infer I> ? I : never>(
-    Component: ComponentType<P>,
-  ) => (props: WithThemeHocProps<P, T, Key>) => JSX.Element) => {
+  ): (<C extends ComponentType, Props = C extends ComponentType<infer I> ? I : never>(
+    Component: ComponentType<Props>,
+  ) => (props: Omit<Props, keyof WithThemeProps<Key, T[Key]>> & { theme?: Key }) => JSX.Element) => {
     return ((Component: ComponentType): ComponentType<WithThemeProps<Key>> => {
       const WithComponent = (props: WithThemeProps<Key>): JSX.Element => {
         const { theme, ...rest } = props;
