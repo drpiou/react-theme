@@ -34,28 +34,48 @@ yarn add @drpiou/react-theme
 ### `themes/index.ts`
 
 ```typescript
-import { defaultTheme } from './default';
+import { darkTheme } from './dark';
+import { lightTheme } from './light';
 
 export type ThemeList = typeof themes;
 
 export type ThemeKey = keyof ThemeList;
 
 export const themes = {
-  default: defaultTheme,
-  dark: defaultTheme,
+  light: lightTheme,
+  dark: darkTheme,
 };
 ```
 
-### `themes/default/index.ts`
+### `themes/light.ts`
 
 ```typescript
-import { Theme } from '../../types/theme';
+import { Theme } from './types';
 
-export const defaultTheme: Theme = {
+export const lightTheme: Theme = {
   colors: {
     background: {
       light: 'rgb(255, 255, 255)',
       dark: 'rgb(28, 28, 30)',
+    },
+    text: {
+      light: 'rgb(28, 28, 30)',
+      dark: 'rgb(255, 255, 255)',
+    },
+  },
+};
+```
+
+### `themes/dark.ts`
+
+```typescript
+import { Theme } from './types';
+
+export const darkTheme: Theme = {
+  colors: {
+    background: {
+      light: 'rgb(28, 28, 30)',
+      dark: 'rgb(255, 255, 255)',
     },
     text: {
       light: 'rgb(255, 255, 255)',
@@ -65,7 +85,7 @@ export const defaultTheme: Theme = {
 };
 ```
 
-### `types/theme.ts`
+### `themes/types.ts`
 
 ```typescript
 export type ThemeColor = keyof ThemeColorList;
@@ -84,131 +104,148 @@ export type Theme = {
 };
 ```
 
-### `contexts/theme/index.tsx`
+### `contexts/theme.ts`
 
-```typescript jsx
-import { createThemeContext, WithThemeProps } from '@drpiou/react-theme';
-import { ThemeKey, themes } from '../../themes/index';
-import { Theme } from '../../types/theme';
+```typescript
+import {
+  createThemeContext,
+  ThemeRef,
+  WithThemeProps,
+} from '@drpiou/react-theme';
+import { ThemeKey, themes } from '../themes';
+import { Theme } from '../themes/types';
 
-export type ThemedProps<C> = C & WithThemeProps<ThemeKey, Theme>;
+export type ThemedProps = WithThemeProps<ThemeKey, Theme>;
+
+export type ThemedRef = ThemeRef<ThemeKey, Theme>;
 
 export const [useTheme, ThemeProvider, withTheme, withoutTheme] =
   createThemeContext(themes, {
-    theme: 'default',
+    theme: 'dark',
   });
 ```
 
 ### `App.tsx`
 
 ```typescript jsx
+import MyComponent from './components/MyComponent';
+import MyComponentWithTheme from './components/MyComponentWithTheme';
 import { ThemeProvider } from './contexts/theme';
 
 const App = (): JSX.Element => {
-  return <ThemeProvider>{/* ... */}</ThemeProvider>;
+  return (
+    <ThemeProvider onChange={console.log} onRef={console.log}>
+      <MyComponent />
+      <MyComponentWithTheme />
+    </ThemeProvider>
+  );
 };
 
 export default App;
 ```
 
-### `components/ThemeText/index.tsx`
-
-```typescript jsx
-import { ThemedProps, withoutTheme, withTheme } from '../../contexts/theme';
-
-export type ThemeTextProps = ThemedProps<HTMLParagraphElement>;
-
-const ThemeText = (props: ThemeTextProps): JSX.Element => {
-  const { colors, ...textProps } = props;
-
-  return <p {...withoutTheme(textProps)} style={{ color: colors.text.dark }} />;
-};
-
-export default withTheme()(ThemeText);
-```
-
-### `screens/Splash/index.tsx`
+### `components/MyComponent/index.tsx`
 
 ```typescript jsx
 import { useTheme } from '../../contexts/theme';
 
-const SplashScreen = (): JSX.Element => {
+const MyComponent = (): JSX.Element => {
   const { colors, theme, setTheme } = useTheme();
 
-  const handlePress = (): void => {
-    setTheme(theme === 'default' ? 'dark' : 'default');
+  const handleClick = (): void => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
   return (
-    <div style={{ backgroundColor: colors.background.light }}>
-      <div onClick={handlePress} />
+    <div className={'card'}>
+      <button onClick={handleClick}>{theme}</button>
+      <p>{`background: ${colors.background.light}`}</p>
     </div>
   );
 };
 
-export default SplashScreen;
+export default MyComponent;
+```
+
+### `components/MyComponentWithTheme/index.tsx`
+
+```typescript jsx
+import { ThemedProps, withoutTheme, withTheme } from '../../contexts/theme';
+
+const MyComponentWithTheme = withTheme()(
+  (props: ThemedProps & HTMLProps<HTMLDivElement>): JSX.Element => {
+    const { colors, theme, setTheme, ...rest } = props;
+
+    const handleClick = (): void => {
+      setTheme(theme === 'light' ? 'dark' : 'light');
+    };
+
+    return (
+      <div {...withoutTheme(rest)} className={'card'}>
+        <button onClick={handleClick}>{theme}</button>
+        <p>{`text: ${colors.text.light}`}</p>
+      </div>
+    );
+  },
+);
+
+export default MyComponentWithTheme;
 ```
 
 ## Documentation
 
 ```typescript
-type createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
+export type createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   themes: T,
   contextOptions: ThemeContextOptions<DefaultKey>,
 ) => [
   useTheme<T, Key>,
-  ThemeProvider<T>,
+  React.ComponentType<ThemeProviderProps<Key, T[Key]>>,
   withTheme<T, Key>,
-  withoutTheme<T, Key, DefaultKey>,
+  withoutTheme<T, Key>,
 ];
 
-type useTheme<T, Key> = (currentTheme?: Key) => T[Key] & {
-  theme: Key;
-  setTheme: SetThemeContext<Key>;
-};
+export type useTheme<T, Key> = () => ThemeRef<Key, T>;
 
-type withTheme<T, Key> = (
+export type withTheme<T, Key> = (
   options?: WithThemeOptions<Key>,
-) => <
-  C extends React.ComponentType,
-  P = C extends React.ComponentType<infer I> ? I : never,
->(
+) => <C extends React.ComponentType, P extends React.ComponentProps<C>>(
   Component: React.ComponentType<P>,
-) => (props: WithThemeHocProps<Omit<P, keyof T[Key]>, Key>) => JSX.Element;
+) => (
+  props: Omit<P, keyof WithThemeProps<Key, T[Key]>> & { theme?: Key },
+) => JSX.Element;
 
-type withoutTheme<T, Key, DefaultKey> = <O extends object>(
+export type withoutTheme<T, Key> = <
+  O extends object,
+  P extends WithThemeProps<Key, T[Key]>,
+  W extends keyof P,
+>(
   rest: O,
-  except?: (keyof T[DefaultKey] | keyof WithThemeProps<unknown, Key>)[],
-) => Omit<O, keyof T[Key]>;
+  without?: W[],
+) => Omit<O, keyof P> & Omit<P, W>;
 
-type ThemeProvider<K> = (props: ThemeProviderProps<K>) => JSX.Element;
-
-type ThemeProviderProps<K> = {
-  theme?: K;
-  defaultTheme?: K;
-  onChange?: (theme: K) => void;
-};
-
-type ThemeContextOptions<K> = {
+export type ThemeContextOptions<K> = {
   theme: K;
 };
 
-type WithThemeProps<P, K> = P & {
+export type ThemeProviderProps<K, T = unknown> = Partial<
+  ThemeContextOptions<K>
+> & {
+  defaultTheme?: K;
+  onChange?: (theme: K) => void;
+  onRef?: (ref: ThemeRef<K, T>) => void;
+};
+
+export type ThemeRef<K, T = unknown> = T & {
   theme: K;
   setTheme: SetThemeContext<K>;
 };
 
-type WithThemeOptions<K> = {
+export type WithThemeProps<K, T = unknown, P = unknown> = P & ThemeRef<K, T>;
+
+export type WithThemeOptions<K> = {
   theme?: K;
-  defaultTheme?: K;
 };
 
-type WithThemeHocProps<P, T, Key extends keyof T> = Omit<
-  WithThemeProps<Key, Omit<P, keyof T[Key]>>,
-  keyof WithThemeProps<Key>
-> & {
-  theme?: Key;
-};
-
-type SetThemeContext<K> = (state: K | ((state: K) => K | null)) => void;
+export type SetThemeContext<K> = (theme: K | ((theme: K) => K | null)) => void;
 ```

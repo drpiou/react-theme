@@ -37,7 +37,7 @@ export type WithThemeOptions<K> = {
   theme?: K;
 };
 
-type SetThemeContext<K> = (state: K | ((state: K) => K | null)) => void;
+export type SetThemeContext<K> = (theme: K | ((theme: K) => K | null)) => void;
 
 const createThemeContext = <T, Key extends keyof T, DefaultKey extends Key>(
   themes: T,
